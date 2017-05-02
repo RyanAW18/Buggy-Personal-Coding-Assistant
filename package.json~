@@ -1,0 +1,26 @@
+{
+  "name": "buggy",
+  "version": "1.0.0",
+  "description": "Web application that allowes users to program with their voice.",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radedoc/Buggy.git"
+  },
+  "author": "Richard Adjei"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/radedoc/Buggy/issues"
+  },
+  "homepage": "https://github.com/radedoc/Buggy#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "http": "0.0.0",
+    "path": "^0.12.7",
+    "socket.io": "^1.7.3"
+  }
+}

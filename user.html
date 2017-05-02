@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Welcome To Buggy</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+    <!-- Theme CSS -->
+    <link href="css/grayscale.css" rel="stylesheet">
+
+    <style>
+        body {
+            display: -webkit-flex; /* Safari 6.1+ */
+            display: -ms-flex; /* IE 10 */ 
+            display: flex;
+            -webkit-flex-direction: column; /* Safari 6.1+ */
+            -ms-flex-direction: column; /* IE 10 */
+            flex-direction: column;
+            -webkit-justify-content: space-between; /* Safari 6.1+ */
+            -ms-justify-content: space-between; /* IE 10 */
+            justify-content: space-between; /* Header top, footer bottom */
+            height: 100vh;  /* Fill viewport height */
+        }
+        main {
+            -webkit-flex: 1 0 0; /* Safari 6.1+ */
+            -ms-flex: 1 0 0; /* IE 10 */
+            flex: 1 0 0; /* Grow to fill space */
+            overflow-y: auto; /* Add scrollbar */
+            height: 100%; /* Needed to fill space in IE */
+        }
+        header, footer {
+            -webkit-flex: 0 0 auto; /* Safari 6.1+ */
+            -ms-flex: 0 0 auto; /* IE 10 */
+            flex: 0 0 auto;
+        }
+
+    </style>
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+    <header>
+         <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">
+                    <i class="fa fa-play-circle"></i> <span class="light">Welcome To</span> Buggy
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+                    <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="http://127.0.0.1:8081/about">About</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="http://127.0.0.1:8081/tutorial">Tutorial</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    </header>
+    <main>
+        <article>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pellentesque lobortis augue, in porta arcu dapibus dapibus. Suspendisse vulputate tempus venenatis. Pellentesque ac euismod urna. Donec dui odio, ullamcorper in posuere eu, laoreet sed nisl. Sed vitae vestibulum leo. Maecenas mattis lacus eget nisl malesuada, quis semper urna ornare. Praesent id mauris nec neque aliquet dignissim.</p>
+                            <p>Morbi varius dolor at lorem aliquet lacinia. Aliquam id lacinia quam. Sed vel libero felis. Etiam et pellentesque sem. Aenean bibendum, ante quis luctus tincidunt, elit mauris volutpat nisi, et tempus lectus sapien in mauris. Aliquam condimentum nisl ut elit accumsan hendrerit. Morbi mollis turpis est, id tincidunt ipsum rhoncus eget. Fusce in feugiat lacus. Quisque vel massa magna. Mauris varius congue nisl, vitae pellentesque diam ultricies at. Sed ac nibh ac diam tristique venenatis non nec nisl. Vivamus enim eros, pretium at iaculis nec, pharetra non sem. Aenean ac imperdiet odio.</p>
+                            <p>Morbi varius dolor at lorem aliquet lacinia. Aliquam id lacinia quam. Sed vel libero felis. Etiam et pellentesque sem. Aenean bibendum, ante quis luctus tincidunt, elit mauris volutpat nisi, et tempus lectus sapien in mauris. Aliquam condimentum nisl ut elit accumsan hendrerit. Morbi mollis turpis est, id tincidunt ipsum rhoncus eget. Fusce in feugiat lacus. Quisque vel massa magna. Mauris varius congue nisl, vitae pellentesque diam ultricies at. Sed ac nibh ac diam tristique venenatis non nec nisl. Vivamus enim eros, pretium at iaculis nec, pharetra non sem. Aenean ac imperdiet odio.</p>
+        </article>
+    </main>
+    <!-- Intro Header -->
+    <div id ="editor">
+
+    </div>
+</body>
+    <script>
+          var editor = ace.edit("editor");
+          editor.setTheme("ace/theme/cobalt");
+          editor.getSession().setMode("ace/mode/python");
+    </script>
+
+</html>
