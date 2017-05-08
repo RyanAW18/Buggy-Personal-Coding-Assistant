@@ -167,6 +167,10 @@ app.post('/createAccount', function(req, res){
   createAccount(email, password, passwordConf, username, redirectHome, redirectEmailCollision, req, res)
 })
 
+app.post('/userInput', function(request, response){
+    res.end("I got it. This is the user's Id "+ request.body.userId + ". This is the statement "+ request.body.sentence);
+})
+
 // Route to Sign up page.
 app.get('/new_account', function(req, res){
   res.sendFile(__dirname + '/create_account.html')
