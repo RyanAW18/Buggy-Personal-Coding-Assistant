@@ -185,7 +185,7 @@ app.get('/tutorial', function(req, res) {
 })
 
 app.get('/dd', function(req, res){
-  res.sendFile(__dirname + '/workspace.html')
+  res.sendFile(__dirname + '/Aindex.html')
 })
 
 // Logout Button.
