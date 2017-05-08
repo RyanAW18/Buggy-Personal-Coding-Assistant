@@ -72,6 +72,11 @@
             document.getElementById("snippet").innerHTML += data.response + '<br>';
            });
 
+           socket.on('opened', function(data){
+            editor.setValue(data.file, -1)
+            editor.navigateFileEnd()
+           });
+
            socket.on('executionresults', function(data){
             document.getElementById("terminal").innerHTML += data.response + '<br>';
            });
@@ -136,6 +141,12 @@
                   var filename = messages[i+4]
                   var user = "luffy"
                   socket.emit('download', {username: user, name: filename});
+                  break;
+                }
+                else if ((((messages[i+1] == "open") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
+                  var filename = messages[i+4]
+                  var user = "luffy"
+                  socket.emit('open', {username: user, name: filename});
                   break;
                 }
               }

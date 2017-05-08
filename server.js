@@ -26,19 +26,55 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('port', process.env.PORT || 8081);
+app.set('views', './views')
+app.set('view engine', 'pug')
 var db_url = "mongodb://ryanaw:c0d1ng!2@ds119091.mlab.com:19091/heroku_5w43r3p2";
 
 /******************************** Page Routing ******************************************/
 
 // Route to main page
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/main.html');
+   if (checkLoginStatus(req)){
+    res.render('workspace', {username: req.session.user})
+  }
+  else {
+    res.sendFile(__dirname + '/main.html');
+  }
 })
 
 // Socket connection setup to aid in communication between server and clients.
 io.on('connection', function(socket){
-  socket.emit('welcome', {message: "Welcome to Buggy!"})
+  socket.emit('welcome', {message: "Welcome to Buggy, "})
   socket.on('disconnect', function () {
+  });
+
+  socket.on('open', function (data) {
+    var username = data.username;
+    var filename = data.name;
+    MongoClient.connect(db_url, function (err, db) {
+      if (err) {
+        console.log('Unable to connect to the mongoDB server. Error:', err);
+      } else {
+        console.log('Database connection established');
+      }
+
+        var userDB = db.collection('users')
+        //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
+        userDB.find({'username' : username}).toArray(function(err, result) {
+          if (err) {
+              console.log(err);
+          } else if (result.length) {
+            console.log("Found account" + username)
+            var dictionary = result[0]["files"];
+            var content = dictionary[filename]
+            socket.emit('opened', {file: content})
+          } else {
+                console.log("no files available of that name")
+                return 0
+            }
+          })
+      });
+    console.log("sorry, you are currently not logged into an account :(")
   });
 
   socket.on('search', function(data){
@@ -128,7 +164,7 @@ app.post('/createAccount', function(req, res){
   var username = req.body.username
   var password = req.body.password
   var passwordConf = req.body.passwordConf
-  createAccount(email, password, passwordConf, username, redirectHome, redirectEmailCollision, res)
+  createAccount(email, password, passwordConf, username, redirectHome, redirectEmailCollision, req, res)
 })
 
 // Route to Sign up page.
@@ -145,7 +181,7 @@ app.get('/tutorial', function(req, res) {
 })
 
 app.get('/dd', function(req, res){
-  res.sendFile(__dirname + '/skult.html')
+  res.sendFile(__dirname + '/workspace.html')
 })
 
 // Logout Button.
@@ -206,7 +242,7 @@ function download(url) {
 
 /********************* Helper functions used in Account creations and Logins *****************/
 
-function createAccount(email, password, passwordConf, username, callbackSucc, callbackFail, res) {
+function createAccount(email, password, passwordConf, username, callbackSucc, callbackFail, req, res) {
 
   var salt = bcrypt. genSaltSync(10);
   var hash = bcrypt.hashSync(password, salt);
@@ -240,7 +276,7 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
                 console.log(err);
                 } else {
                   console.log(username + " was added!")
-                  callbackSucc(res, username)
+                  callbackSucc(req, res, username)
                 }
             })
           }
@@ -289,7 +325,7 @@ function redirectHome(req, res, username) {
   }
   else {
     req.session.user = username
-    res.redirect("/"+username)
+    res.redirect("/")
   }
 }
 
