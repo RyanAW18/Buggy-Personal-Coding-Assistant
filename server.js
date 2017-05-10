@@ -158,6 +158,7 @@ socket.on('getFiles', function(data){
     newsearch(query, language).then((url) => {
       return download(url)
     }).then((html) => {
+        console.log(html)
         let answer = scrape(html)
         if (answer === '') {
         reply += 'No answer found :( \n'
@@ -294,6 +295,7 @@ function newsearch(query, language) {
         })
       } else {
         resolve(res.links[0].href)
+        console.log(res.links[0].href)
       }
     })
   })
