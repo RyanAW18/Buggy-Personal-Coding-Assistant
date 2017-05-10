@@ -241,7 +241,7 @@ app.post('/createAccount', function(req, res){
 })
 
 app.post('/userInput', function(req, res){
-    res.end("I got it. This is the user's Id "+ request.body.userId + ". This is the statement "+ request.body.sentence);
+    res.end("I got it. This is the user's Id "+ req.body.ID + ". This is the statement "+ req.body.speech);
 })
 
 // Route to Sign up page.
