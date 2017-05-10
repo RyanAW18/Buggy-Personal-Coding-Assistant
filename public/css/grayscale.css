@@ -8,7 +8,7 @@ body {
   height: 100%;
   font-family: "Lora", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
-  background-color: black;
+  background-color: #4e4e4e;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    white;
@@ -190,12 +190,20 @@ a:focus {
   padding: 100px 0;
   text-align: center;
   color: white;
-  background: url(../img/intro-bg.jpg) no-repeat bottom center scroll;
-  background-color: black;
-  -webkit-background-size: cover;
+}
+#logo {
+  display: block;
+  height: 50%;
+  opacity: 0.95;
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 40%);
+  /*-webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
-  -o-background-size: cover;
+  -o-background-size: cover;*/
 }
 .intro .intro-body {
   display: table-cell;
@@ -291,7 +299,7 @@ a:focus {
   padding: 50px 0;
   color: white;
   background: url(../img/downloads-bg.jpg) no-repeat center center scroll;
-  background-color: black;
+  background-color: darkblue;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;

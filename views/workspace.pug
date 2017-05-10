@@ -29,6 +29,13 @@ html
       overflow: hidden;
       background-color: #212b3d;
       }
+      #pills {
+      border-radius: 0px;
+      }
+      .btn:not(.btn-link){
+        border-radius: 0px;
+        box-shadow:none;
+      }
       #company {
       left: 49%;
       position: absolute;
@@ -46,7 +53,14 @@ html
       padding: 14px 16px;
       text-decoration: none;
       }
-      li.other a:hover, .dropdown:hover .dropbtn {
+      li.others a, .dropbtn {
+      display: inline-block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      }
+      li.others a:hover, .dropdown:hover .dropbtn {
       background-color: gray;
       }
       li.dropdown {
@@ -92,7 +106,7 @@ html
       width:calc(48% - 10px);
       margin: 5px;
       background-color: white;
-      height:100%;
+      height:92%;
       color: black;
       box-sizing: border-box;
       float:left;
@@ -102,7 +116,7 @@ html
       position: relative;
       margin: 5px;
       width: calc(51% - 10px);
-      height:100%;
+      height:92%;
       float: left
       }
       #center {
@@ -137,10 +151,12 @@ html
       li#company.other
         a.navbar-left(href='#')
           img(src='login/buggy_logo.png', width='25', height='14')
-      li#nav_item.other
+      li#nav_item.others
+        a(href="https://buggy333.herokuapp.com/!") Log Out
+      li#nav_item.others
         a(href='#about') Settings
       li#nav_items.other
-        a(href='#news') BUGGY
+        a BUGGY
     #editor
       code#center
     #snippet
@@ -154,24 +170,56 @@ html
         li
           a#pills(data-toggle='pill', href='#buggy_documentation') Buggy Commands
 
-      .tab-content(style="position: absolute; display:block; width:100% !important; height:100% !important; padding:0;border-width:0")
+      .tab-content(style="position: absolute; display:block; width:100% !important; height:70% !important; padding:0;border-width:0")
 
-        #code_snippets_holder.tab-pane.fade.in.active(style="position: absolute; width:100%; height:100%; overflow: auto")
-          pre#code_snippets.tab-pane.fade.in.active(style='display:block; background-color: white; border: none')
+        #code_snippets_holder.tab-pane.fade.in.active(style="overflow: auto")
+          pre#code_snippets(style='background-color: white; border: none')
 
-        #files.tab-pane.fade(style='display:block; background-color: white; border: none')
+        #files.tab-pane.fade(style='background-color: white; border: none')
           .card
             .listview.lv-bordered.lv-lg
-              .lv-header-alt.clearfix
-                form
-                  input(type='text', name='search', placeholder='Search Files')
+              //.lv-header-alt.clearfix
+                //form
+                  //input(type='text', name='search', placeholder='Search Files')
               .lv-body
 
-        #code_execution.tab-pane.fade(style="position: absolute; width:100%; height:100%; overflow: auto")
-          pre#output.tab-pane.fade(style='display:block; background-color: white; border: none')
+        #code_execution.tab-pane.fade(style='background-color: white; border: none')
+          pre#output(style='background-color: white; border: none')
 
         #buggy_documentation.tab-pane.fade(style='display:block; background-color: white; border: none')
-          p Fill this with information on how to use buggy !!!!!!!!!!!!
+          pre(style='background-color: white; border:none').
+            General commands:
+            “Buggy, start/stop listening” turns the voice recognition on and off
+            “Buggy, please run” executes your code and displays the results
+            “Buggy, search for ____” searches StackOverflow for ____ and displays the results
+            “Focus” simulates clicking on the text input field
+            File commands:
+            “Buggy, save file as ____” saves the file to user’s account with ____ as its filename
+            “Buggy, delete file named ____” deletes the file named ____.
+            “Buggy,download file named ____” downloads the file named ____.
+            “Buggy, open file named ____” opens the file named ____.
+            Cursor commands:
+            “Move left/right/up/down” moves the cursor left/right one word, or up/down one line 
+            “Move to start/end” moves the cursor to the start/end of the file 
+            “Move to front/back” moves the cursor to the front/back of the line of code
+            Typing commands: 
+            Saying _____ types _____ in the document
+            If you make a mistake: “clear” removes the line, “reset” restarts the document
+            If a word isn’t working, spell it out
+            Special characters have their own rules:
+             “Pound” to type #
+            “Asterisk” to type *
+            “Colon” to type :
+            “Comma” to type ,
+            “Space” to type a space
+            “Enter” to start a new line
+            “Left curly” to type {
+            “Right curly” to type }
+            “Left paren” to type (
+            “Right paren” to type )
+            “Left bracket” to type [
+            “Right bracket” to type ]  
+
 
     script(src='/socket.io/socket.io.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js', type='text/javascript', charset='utf-8')
@@ -199,7 +247,7 @@ html
       socket.on('welcome', function(data){
       var user = ""+ "#{user_name}"
       console.log(user);
-      document.getElementById("code_snippets").innerHTML += data.message +  user;
+      document.getElementById("code_snippets").innerHTML += data.message +  user + '!\n';
       });
 
       var deleteFile = function (filename){
@@ -285,17 +333,17 @@ html
       var spanDiv = document.createElement('span');
       spanDiv.className = 'glyphicon glyphicon-floppy-save';
       parent.append(spanDiv);
-      parent.innerHTML += "Save";
+      parent.innerHTML += " Save";
 
       spanDiv = document.createElement('span');
       spanDiv.className = 'glyphicon glyphicon-download';
       download_button.append(spanDiv);
-      download_button.innerHTML += "Download";
+      download_button.innerHTML += " Download";
 
       spanDiv = document.createElement('span');
       spanDiv.className = 'glyphicon glyphicon-trash';
       delete_button.append(spanDiv);
-      delete_button.innerHTML += "Delete";
+      delete_button.innerHTML += " Delete";
 
       delete_button.addEventListener("click", function(e) {
         document.getElementById(data.filename).remove();
@@ -315,6 +363,7 @@ html
         console.log('true')
         e.stopPropagation()
       }, false);
+
      });
 
       socket.on('downloadableFile', function(data){
@@ -326,6 +375,8 @@ html
       elem.click();
       document.body.removeChild(elem);
       });
+
+
       /**************************************** Running Code on the Client Side ******************************************/
       // output functions are configurable.  This one just appends some text
       // to a pre element.
@@ -359,6 +410,7 @@ html
       console.log(err.toString());
       });
       }
+
       /****************************************  Compiler ****************************************************************/
       listening = false;
       socket.emit('getFiles', {username: "#{user_name}"});
@@ -381,7 +433,7 @@ html
                   for (j = i + 1; j < messages.length; j++){
                     query += messages[j] + ' ';
                   }
-                  document.getElementById("snippet").innerHTML+=query + '<br>';
+                  document.getElementById("code_snippets").innerHTML+=query + '<br>';
                   socket.emit('search', {message: query});
                   break;
                 }
