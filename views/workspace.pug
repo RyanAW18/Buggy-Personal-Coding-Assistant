@@ -166,6 +166,19 @@ html
                 form
                   input(type='text', name='search', placeholder='Search Files')
               .lv-body
+                .lv-item.media
+                  .btn-demo
+                    .lv-title filename
+                      .button_holder
+                        button.btn.btn-default.btn-sm(type='button')
+                          span.glyphicon.glyphicon-floppy-save
+                          |  Save
+                        button.btn.btn-default.btn-sm(type='button')
+                          span.glyphicon.glyphicon-download
+                          |  Download
+                        button.btn.btn-default.btn-sm(type='button')
+                          span.glyphicon.glyphicon-trash
+                          |  Delete
 
 
 
@@ -208,6 +221,21 @@ html
         socket.emit('deleteFile', {username: user, name: file});
       }
 
+      var downloadFile = function (user, file){
+        socket.emit('download', {username: user , name: file});
+      } 
+
+      var saveFile = function (filename){
+      var fileContent = editor.getValue();
+      var user = "#{user_name}"
+      socket.emit('saveFile', {content: fileContent, username: user, name: filename});
+      }
+
+      var openFile = function(filename){
+        var user = "#{user_name}"
+        socket.emit('open', {username: user, name: filename});
+      }
+
 
       socket.on('files', function(data){
       console.log(data.filename);
@@ -215,6 +243,7 @@ html
       var file = document.createElement('div');
       file.id = data.filename;
       file.className = "lv-item media"; 
+      file.setAttribute("onclick", "openFile(data.filename)");
 
       var parent = document.getElementsByClassName("lv-body")[0];
       parent.appendChild(file);
@@ -266,6 +295,11 @@ html
       spanDiv.className = 'glyphicon glyphicon-trash';
       delete_button.append(spanDiv);
       delete_button.innerHTML += "Delete";
+
+      var user = "#{user_name}"
+      delete_button.setAttribute("onclick", "deleteFile(user, data.filename)");
+      download_button.setAttribute("onclick", "downloadFile(user, data.filename)");
+      save_button.setAttribute("onclick", "saveFile(data.filename)");
      });
 
       socket.on('downloadableFile', function(data){
