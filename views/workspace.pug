@@ -166,21 +166,6 @@ html
                 form
                   input(type='text', name='search', placeholder='Search Files')
               .lv-body
-                .lv-item.media
-                  .btn-demo
-                    .lv-title filename
-                      .button_holder
-                        button.btn.btn-default.btn-sm(type='button')
-                          span.glyphicon.glyphicon-floppy-save
-                          |  Save
-                        button.btn.btn-default.btn-sm(type='button')
-                          span.glyphicon.glyphicon-download
-                          |  Download
-                        button.btn.btn-default.btn-sm(type='button')
-                          span.glyphicon.glyphicon-trash
-                          |  Delete
-
-
 
         #code_execution.tab-pane.fade(style="position: absolute; width:100%; height:100%; overflow: auto")
           pre#output.tab-pane.fade(style='display:block; background-color: white; border: none')
@@ -217,12 +202,14 @@ html
       document.getElementById("code_snippets").innerHTML += data.message +  user;
       });
 
-      var deleteFile = function (user, file){
-        socket.emit('deleteFile', {username: user, name: file});
+      var deleteFile = function (filename){
+        var user = "#{user_name}"
+        socket.emit('deleteFile', {username: user, name: filename});
       }
 
-      var downloadFile = function (user, file){
-        socket.emit('download', {username: user , name: file});
+      var downloadFile = function (filename){
+        var user = "#{user_name}"
+        socket.emit('download', {username: user , name: filename});
       } 
 
       var saveFile = function (filename){
@@ -232,18 +219,30 @@ html
       }
 
       var openFile = function(filename){
-        var user = "#{user_name}"
+        var user = "#{user_name}";
         socket.emit('open', {username: user, name: filename});
       }
 
 
       socket.on('files', function(data){
-      console.log(data.filename);
 
+      console.log(data.filename);
+      var user = "#{user_name}";
       var file = document.createElement('div');
+      var filename = data.filename;
       file.id = data.filename;
       file.className = "lv-item media"; 
-      file.setAttribute("onclick", "openFile(file.id)");
+
+      file.addEventListener("click", function() {
+        var list = document.getElementsByClassName("button_holder");
+        console.log(list)
+        for (var i = 0; i < list.length; i++){
+          list[i].style.visibility = "hidden"
+        }
+        openFile(data.filename);
+        document.getElementById(data.filename+"_buttons").style.visibility="visible";
+        console.log('true')
+      }, false);
 
       var parent = document.getElementsByClassName("lv-body")[0];
       parent.appendChild(file);
@@ -262,6 +261,8 @@ html
       parent = titleDiv;
       var button_holder_Div = document.createElement('div');
       button_holder_Div.className = 'button_holder';
+      button_holder_Div.id = data.filename+"_buttons"
+      button_holder_Div.style.visibility ='hidden'
       parent.append(button_holder_Div);
 
       parent = button_holder_Div;
@@ -296,10 +297,24 @@ html
       delete_button.append(spanDiv);
       delete_button.innerHTML += "Delete";
 
-      var user = "#{user_name}"
-      delete_button.setAttribute("onclick", "deleteFile(user, data.filename)");
-      download_button.setAttribute("onclick", "downloadFile(user, data.filename)");
-      save_button.setAttribute("onclick", "saveFile(data.filename)");
+      delete_button.addEventListener("click", function(e) {
+        document.getElementById(data.filename).remove();
+        deleteFile(data.filename);
+        console.log('true')
+        e.stopPropagation()
+      }, false);
+
+      download_button.addEventListener("click", function(e) {
+        downloadFile(data.filename);
+        console.log('true')
+        e.stopPropagation()
+      }, false);
+
+      save_button.addEventListener("click", function(e) {
+        saveFile(data.filename);
+        console.log('true')
+        e.stopPropagation()
+      }, false);
      });
 
       socket.on('downloadableFile', function(data){
@@ -309,7 +324,7 @@ html
       elem.style.display = 'none';
       document.body.appendChild(elem);
       elem.click();
-      document.body.removeChild(element);
+      document.body.removeChild(elem);
       });
       /**************************************** Running Code on the Client Side ******************************************/
       // output functions are configurable.  This one just appends some text
