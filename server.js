@@ -241,7 +241,7 @@ app.post('/createAccount', function(req, res){
 })
 
 app.post('/userInput', function(req, res){
-    res.send("I got it.");
+  console.log(res);
 })
 
 // Route to Sign up page.

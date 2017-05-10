@@ -243,7 +243,7 @@ html
       var file = document.createElement('div');
       file.id = data.filename;
       file.className = "lv-item media"; 
-      file.setAttribute("onclick", "openFile(data.filename)");
+      file.setAttribute("onclick", "openFile(file.id)");
 
       var parent = document.getElementsByClassName("lv-body")[0];
       parent.appendChild(file);
