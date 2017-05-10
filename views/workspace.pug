@@ -414,6 +414,16 @@ html
       /****************************************  Compiler ****************************************************************/
       listening = false;
       socket.emit('getFiles', {username: "#{user_name}"});
+
+      var updater = function() {
+        var list = document.getElementsByClassName("lv-item media");
+        console.log(list)
+        for (var i = 0; i < list.length; i++){
+          list[i].remove()
+        }
+        socket.emit('getFiles', {username: "#{user_name}"});
+      }
+
       var compiler = function(data, editor){
 
             var messages = data.split(" ");
@@ -448,12 +458,14 @@ html
                   var filename = messages[i+4]
                   var user = "#{user_name}"
                   socket.emit('saveFile', {content: fileContent, username: user, name: filename});
+                  updater()
                   break;
                 }
                 else if ((((messages[i+1] == "delete") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
                   var filename = messages[i+4]
                   var user = "#{user_name}"
                   socket.emit('deleteFile', {username: user, name: filename});
+                  updater()
                   break;
                 }
                 else if ((((messages[i+1] == "download") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
@@ -478,6 +490,9 @@ html
                   }
                 else if (messages[i] == "star") {
                   editor.insert("*");
+                }
+                else if (messages[i] == "colon") {
+                  editor.insert(":");
                 }
                 else if (messages[i] == "pound") {
                   editor.insert("#");

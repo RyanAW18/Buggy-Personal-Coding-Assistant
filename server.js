@@ -259,7 +259,7 @@ app.get('/tutorial', function(req, res) {
 })
 
 app.get('/dd', function(req, res){
-  res.sendFile(__dirname + '/newworkspace.html')
+  res.sendFile(__dirname + '/skult.html')
 })
 
 // Logout Button.
