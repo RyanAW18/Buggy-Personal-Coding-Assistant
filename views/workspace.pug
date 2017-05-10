@@ -4,10 +4,23 @@ html
     script(src='skultjs/skulpt.min.js', type='text/javascript')
     script(src='skultjs/skulpt-stdlib.js', type='text/javascript')
     meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Buggy
+
+    // Vendor CSS
+    link(href='jquery/vendors/bower_components/animate.css/animate.min.css', rel='stylesheet')
+    link(href='jquery/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css', rel='stylesheet')
+    link(href='jquery/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css', rel='stylesheet')
+    link(href='jquery/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css', rel='stylesheet')
+
+    // CSS
+    link(href='jquery/css/app.min.1.css', rel='stylesheet')
+    link(href='jquery/css/app.min.2.css', rel='stylesheet')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+
     style.
       ul.top_nav {
       list-style-type: none;
@@ -58,40 +71,14 @@ html
       .dropdown:hover .dropdown-content {
       display: block;
       }
-      ul.bottom_nav {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #212b3d;
-      bottom: 0;
-      width: 100%;
-      height:6%;
-      }
-      li.tool {
-      float: left;
-      }
-      li.tool a {
-      display: block;
-      color: white;
-      text-align: center;
-      padding: 14px 16px;
-      text-decoration: none;
-      }
-      li.tool a:hover {
-      background-color: gray;
-      }
       html, body {
       height: 100%;
       margin: 0;
-      }
-      div {
-      height: 100%;
-      float: left;
+      background-color: #212b3d;
       }
       pre {
         position: absolute
-        height: auto;
+        height: 100%;
         width:100%;
         overflow: auto;
         background-color: #eeeeee;
@@ -99,31 +86,51 @@ html
         word-wrap: normal !important;
         white-space: pre !important;
       }
+
       #snippet {
       position: relative;
-      width:calc(30% - 10px);
+      width:calc(48% - 10px);
       margin: 5px;
       background-color: white;
-      height:86.4%;
+      height:100%;
       color: black;
       box-sizing: border-box;
+      float:left;
+      overflow-y:auto;
       }
-      #center {
-      margin: 5px;
-      width: calc(40% - 10px);
-      height:86.4%;
-      }
-      #terminal {
+      #editor {
       position: relative;
       margin: 5px;
-      width: calc(30% - 10px);
-      background-color: white;
-      height:86.4%;
-      color: black;
-      box-sizing: border-box;
+      width: calc(51% - 10px);
+      height:100%;
+      float: left
       }
-      body{
-      background-color: #212b3d;
+      #center {
+      position: absolute;
+      width: 100%;
+      height:100%;
+      }
+      input[type=text] {
+        width: 200px;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        background-color: white;
+        background-image: url('searchicon.png');
+        background-position: 10px 10px; 
+        background-repeat: no-repeat;
+        padding: 12px 20px 12px 40px;
+        -webkit-transition: width 0.4s ease-in-out;
+        transition: width 0.4s ease-in-out;
+      }
+      .button_holder{
+        float: right;
+      }
+      input[type=text]:focus {
+        width: 100%;
+      }
+
   body
     - var user_name = (username);
     ul.top_nav
@@ -134,28 +141,38 @@ html
         a(href='#about') Settings
       li#nav_items.other
         a(href='#news') BUGGY
+    #editor
+      code#center
     #snippet
       ul.nav.nav-pills.nav-justified
         li
           a#pills(data-toggle='pill', href='#files') My Files
         li.active
           a#pills(data-toggle='pill', href='#code_snippets_holder') Code Snippets
-      .tab-content(style="position: absolute; display:block; width:100% !important; height:100% !important; padding:0;border-width:0")
-        #code_snippets_holder.tab-pane.fade.in.active(style="position: absolute; width:100%; height:100%; overflow: auto")
-          pre#code_snippets.tab-pane.fade.in.active(style='display:block; background-color: white; border: none').
-        pre#files.tab-pane.fade(style='display:block; background-color: white; border: none')
-          p  Show files Here 
-    #center
-    #terminal
-      ul.nav.nav-pills.nav-justified
-        li.active
+        li
           a#pills(data-toggle='pill', href='#code_execution') Code Execution
         li
-          a#pills(data-toggle='pill', href='#buggy_documentation') Buggy Documentation
+          a#pills(data-toggle='pill', href='#buggy_documentation') Buggy Commands
+
       .tab-content(style="position: absolute; display:block; width:100% !important; height:100% !important; padding:0;border-width:0")
-        #code_execution.tab-pane.fade.in.active(style="position: absolute; width:100%; height:100%; overflow: auto")
-          pre#output.tab-pane.fade.in.active(style='display:block; background-color: white; border: none').
-        pre#buggy_documentation.tab-pane.fade(style='display:block; background-color: white; border: none')
+
+        #code_snippets_holder.tab-pane.fade.in.active(style="position: absolute; width:100%; height:100%; overflow: auto")
+          pre#code_snippets.tab-pane.fade.in.active(style='display:block; background-color: white; border: none')
+
+        #files.tab-pane.fade(style='display:block; background-color: white; border: none')
+          .card
+            .listview.lv-bordered.lv-lg
+              .lv-header-alt.clearfix
+                form
+                  input(type='text', name='search', placeholder='Search Files')
+              .lv-body
+
+
+
+        #code_execution.tab-pane.fade(style="position: absolute; width:100%; height:100%; overflow: auto")
+          pre#output.tab-pane.fade(style='display:block; background-color: white; border: none')
+
+        #buggy_documentation.tab-pane.fade(style='display:block; background-color: white; border: none')
           p Fill this with information on how to use buggy !!!!!!!!!!!!
 
     script(src='/socket.io/socket.io.js')
@@ -165,21 +182,92 @@ html
       var editor = ace.edit("center");
       editor.setTheme("ace/theme/cobalt");
       editor.getSession().setMode("ace/mode/python");
+      editor.setShowPrintMargin(false);
       /************************************** Socket Setup ***************************************************************/
       var socket = io();
       socket.on('reply', function(data){
       document.getElementById("code_snippets").innerHTML += data.response + '\n';
       });
+
       socket.on('opened', function(data){
       editor.setValue(data.file, -1)
       editor.navigateFileEnd()
       });
+
       socket.on('executionresults', function(data){
-      document.getElementById("terminal").innerHTML += data.response + '<br>';
+      document.getElementById("code_execution").innerHTML += data.response + '<br>';
       });
+
       socket.on('welcome', function(data){
-      document.getElementById("code_snippets").innerHTML += data.message +  "#{user_name}!\n";
+      var user = ""+ "#{user_name}"
+      console.log(user);
+      document.getElementById("code_snippets").innerHTML += data.message +  user;
       });
+
+      var deleteFile = function (user, file){
+        socket.emit('deleteFile', {username: user, name: file});
+      }
+
+
+      socket.on('files', function(data){
+      console.log(data.filename);
+
+      var file = document.createElement('div');
+      file.id = data.filename;
+      file.className = "lv-item media"; 
+
+      var parent = document.getElementsByClassName("lv-body")[0];
+      parent.appendChild(file);
+
+      parent = file;
+      var button_demo_div = document.createElement('div');
+      button_demo_div.className = "btn-demo";
+      parent.appendChild(button_demo_div);
+
+      parent = button_demo_div;
+      var titleDiv = document.createElement('div');
+      titleDiv.classname = "lv-title"
+      titleDiv.innerHTML = data.filename;
+      parent.append(titleDiv);
+
+      parent = titleDiv;
+      var button_holder_Div = document.createElement('div');
+      button_holder_Div.className = 'button_holder';
+      parent.append(button_holder_Div);
+
+      parent = button_holder_Div;
+      var save_button = document.createElement('button');
+      save_button.className = "btn btn-default btn-sm";
+      save_button.type = "button";
+      parent.append(save_button);
+
+      var download_button = document.createElement('button');
+      download_button.className = "btn btn-default btn-sm";
+      download_button.type = "button";
+      parent.append(download_button);
+
+      var delete_button = document.createElement('button');
+      delete_button.className = "btn btn-default btn-sm";
+      delete_button.type = "button";
+      parent.append(delete_button);
+
+      parent = save_button;
+      var spanDiv = document.createElement('span');
+      spanDiv.className = 'glyphicon glyphicon-floppy-save';
+      parent.append(spanDiv);
+      parent.innerHTML += "Save";
+
+      spanDiv = document.createElement('span');
+      spanDiv.className = 'glyphicon glyphicon-download';
+      download_button.append(spanDiv);
+      download_button.innerHTML += "Download";
+
+      spanDiv = document.createElement('span');
+      spanDiv.className = 'glyphicon glyphicon-trash';
+      delete_button.append(spanDiv);
+      delete_button.innerHTML += "Delete";
+     });
+
       socket.on('downloadableFile', function(data){
       var elem = document.createElement('a');
       elem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.content));
@@ -223,6 +311,8 @@ html
       });
       }
       /****************************************  Compiler ****************************************************************/
+      listening = false;
+      socket.emit('getFiles', {username: "#{user_name}"});
       var compiler = function(data, editor){
 
             var messages = data.split(" ");
@@ -248,32 +338,32 @@ html
                 }
                 else if ((messages[i+1] == "please") && (messages[i+2] == "run")) {
                   var text = editor.getValue();
-                  document.getElementById("terminal").innerHTML += "Executing code:" + '<br>';
+                  document.getElementById("code_execution").innerHTML += "Executing code:" + '<br>';
                   socket.emit('execute', {message: text});
                   break;
                 }
                 else if ((((messages[i+1] == "save") && (messages[i+2] == 'file')) && (messages[i+3] == 'as')) && (messages.length >= 5)) {
                   var fileContent = editor.getValue();
                   var filename = messages[i+4]
-                  var user = "luffy"
+                  var user = "#{user_name}"
                   socket.emit('saveFile', {content: fileContent, username: user, name: filename});
                   break;
                 }
                 else if ((((messages[i+1] == "delete") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
                   var filename = messages[i+4]
-                  var user = "luffy"
+                  var user = "#{user_name}"
                   socket.emit('deleteFile', {username: user, name: filename});
                   break;
                 }
                 else if ((((messages[i+1] == "download") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
                   var filename = messages[i+4]
-                  var user = "luffy"
-                  socket.emit('download', {username: user, name: filename});
+                  var user = "#{user_name}";
+                  socket.emit('download', {username: user , name: filename});
                   break;
                 }
                 else if ((((messages[i+1] == "open") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
                   var filename = messages[i+4]
-                  var user = "luffy"
+                  var user = "#{user_name}";
                   socket.emit('open', {username: user, name: filename});
                   break;
                 }
@@ -409,12 +499,3 @@ html
         }
           console.log("Hello World")
           recognition.start()
-    ul.bottom_nav
-      li.tool
-        a(href='#home') Save
-      li.tool
-        a(href='#news') Run
-      li.tool
-        a(href='#contact') Download
-      li.tool
-        a(href='#about') Open

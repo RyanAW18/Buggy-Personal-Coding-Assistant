@@ -45,6 +45,79 @@ app.get('/', function(req, res){
 // Socket connection setup to aid in communication between server and clients.
 io.on('connection', function(socket){
   socket.emit('welcome', {message: "Welcome to Buggy, "})
+
+  /******** FILE RENDER Function ******************************************************/
+function fileRender(username, callbackFail) {
+
+  if ((typeof(username) != 'string') || (feedback == ""))
+  {
+    console.log('Not a valid input');
+    callbackFail(res);
+  }
+  else
+  {
+    // Connect to the Server
+    MongoClient.connect(db_url, function (err, db) {
+    if (err) {
+      console.log('Unable to connect to the mongoDB server. Error:', err);
+    } else {
+      console.log('Database connection established');
+    }
+
+      var userDB = db.collection('users')
+      //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
+      userDB.find({'username' : username}).toArray(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else if (result.length) {
+            callbackFail(res)
+        } else {
+              var dictionary = result[0]["files"];
+              var files = []
+              for (var key in dictionary) {
+                files.push(key);
+              }
+
+              socket.emit('files', files)
+              //send the file names to the front end
+          }
+        })
+    });
+  }
+}
+
+socket.on('getFiles', function(data){
+  var username = data.username;
+    // Connect to the Server
+    MongoClient.connect(db_url, function (err, db) {
+    if (err) {
+      console.log('Unable to connect to the mongoDB server. Error:', err);
+    } else {
+      console.log('Database connection established');
+    }
+
+      var userDB = db.collection('users')
+      //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
+      userDB.find({'username' : username}).toArray(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else if (result.length) {
+          var dictionary = result[0]["files"];
+              var files = []
+              for (var key in dictionary) {
+                console.log(key);
+                socket.emit('files', {filename: key});
+              }
+
+        } else {
+              console.log("Everything else failed.")
+          }
+        })
+    });
+});
+
+/**************************************************************************************/
+
   socket.on('disconnect', function () {
   });
 
@@ -167,7 +240,7 @@ app.post('/createAccount', function(req, res){
   createAccount(email, password, passwordConf, username, redirectHome, redirectEmailCollision, req, res)
 })
 
-app.post('/userInput', function(request, response){
+app.post('/userInput', function(req, res){
     res.end("I got it. This is the user's Id "+ request.body.userId + ". This is the statement "+ request.body.sentence);
 })
 
@@ -185,7 +258,7 @@ app.get('/tutorial', function(req, res) {
 })
 
 app.get('/dd', function(req, res){
-  res.render('Aindex')
+  res.sendFile(__dirname + '/newworkspace.html')
 })
 
 // Logout Button.
