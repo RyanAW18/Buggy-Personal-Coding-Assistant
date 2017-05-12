@@ -313,9 +313,9 @@ function download(url) {
       } else {
         reject({
           reason: 'Unable to download page'
-          console.log(error)
-          console.log(response.statusCode)
-          console.log(response)
+          reason: error
+          reason: response.statusCode
+          reason: response
         })
       }
     })
