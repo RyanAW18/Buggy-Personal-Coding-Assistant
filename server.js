@@ -311,11 +311,9 @@ function download(url) {
       if (!error && response.statusCode == 200) {
         resolve(body)
       } else {
+        console.log(error)
         reject({
           reason: 'Unable to download page'
-          reason: error
-          reason: response.statusCode
-          reason: response
         })
       }
     })
