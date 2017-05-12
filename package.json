@@ -31,7 +31,7 @@
     "path": "^0.12.7",
     "pug": "^2.0.0-rc.1",
     "python-runner": "^1.1.0",
-    "request": "^2.73.0",
+    "request": "^2.81.0",
     "socket.io": "^1.7.3"
   }
 }
