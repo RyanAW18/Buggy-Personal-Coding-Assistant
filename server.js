@@ -348,7 +348,7 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
         } else if (result.length > 0) {
             callbackFail(res)
         } else {
-              userDB.dropIndex({username : 1}, {email : 1});
+              userDB.dropIndex({email : 1});
               var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
             userDB.insert(userJSON, function(err, result) {
             if (err) {
