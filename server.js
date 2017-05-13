@@ -352,6 +352,9 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
               if (check == true) {
                 var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
               }
+              else {
+                callbackFail(res)
+              }
             userDB.insert(userJSON, function(err, result) {
             if (err) {
                 console.log(err);
@@ -371,7 +374,7 @@ function checkEmail(email, res) {
         if (err) {
             console.log(err);
         } else if (result.length > 0) {
-            callbackFail(res)
+            return false;
         }
         else
         {
