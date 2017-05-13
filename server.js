@@ -345,7 +345,7 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
       userDB.find({'username' : username}, {'email' : email}).toArray(function(err, result) {
         if (err) {
             console.log(err);
-        } else if (result.length) {
+        } else if (result.length > 0) {
             callbackFail(res)
         } else {
               var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
