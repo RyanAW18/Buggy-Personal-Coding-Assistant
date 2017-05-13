@@ -328,8 +328,6 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
   var hash = bcrypt.hashSync(password, salt);
 
   if ((password != passwordConf) || (email == "") || (password == "") || (username == "")) {
-    console.log(password)
-    console.log(passwordConf)
     callbackFail(res)
   }
   else
@@ -344,7 +342,7 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
 
       var userDB = db.collection('users')
       //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-      userDB.find({'username' : username}, {'email' : email}).toArray(function(err, result) {
+      userDB.find({'username' : username}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } else if (result.length) {
@@ -378,7 +376,7 @@ function loginAccount(username, password, callbackSucc, callbackFail, req, res) 
 
       var userDB = db.collection('users')
       console.log(username)
-      userDB.find({'username' : username}, {'email' : email}).toArray(function(err, result) {
+      userDB.find({'username' : username}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } 
