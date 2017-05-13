@@ -348,13 +348,8 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
         } else if (result.length > 0) {
             callbackFail(res)
         } else {
-              var check = checkEmail(email, res);
-              if (check == true) {
-                var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
-              }
-              else {
-                callbackFail(res)
-              }
+              userDB.dropIndex({'username' : username}, {'email' : email});
+              var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
             userDB.insert(userJSON, function(err, result) {
             if (err) {
                 console.log(err);
@@ -367,21 +362,6 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
         })
     });
   }
-}
-
-function checkEmail(email, res) {
-  userDB.find({'username' : username}).toArray(function(err, result) {
-        if (err) {
-            console.log(err);
-        } else if (result.length > 0) {
-            return false;
-        }
-        else
-        {
-          return true;
-        }
-      })
-        
 }
 
 function loginAccount(username, password, callbackSucc, callbackFail, req, res) {
