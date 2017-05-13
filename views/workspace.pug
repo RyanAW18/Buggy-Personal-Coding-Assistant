@@ -159,6 +159,8 @@ html
         a(href="https://buggy333.herokuapp.com/!") Log Out
       li#nav_items.others
         a(onclick = "") New File
+      li#nav_items.others
+        a(onclick = "") Save File
     #editor
       ul.nav.nav-pills.nav-justified
         li.active
@@ -198,6 +200,7 @@ html
             li.code_exec(style="background-color: green; border-radius: 5px")
               a#pill(onclick="execute()" style="color: white;") Run
           pre#output(style='background-color: white; border: none')
+          pre#mycanvas(style='background-color: white; border: none')
 
         #buggy_documentation.tab-pane.fade(style='background-color: white; border: none')
           pre(style='background-color: white; border:none').
