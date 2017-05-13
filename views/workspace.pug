@@ -37,7 +37,7 @@ html
         box-shadow:none;
       }
       #company {
-      left: 49%;
+      left: 46%;
       position: absolute;
       }
       #nav_item {
@@ -61,10 +61,13 @@ html
       text-decoration: none;
       }
       li.others a:hover, .dropdown:hover .dropbtn {
-      background-color: gray;
+      background-color: black;
       }
       li.dropdown {
       display: inline-block;
+      }
+      li.code_exec a:hover, .dropdown:hover .dropbtn {
+      background-color: gray;
       }
       .dropdown-content {
       display: none;
@@ -145,34 +148,27 @@ html
       input[type=text]:focus {
         width: 100%;
       }
-
   body
     - var user_name = (username);
     ul.top_nav
       li#company.other
         a.navbar-left(href='#')
           img(src='login/buggy_logo.png', width='25', height='14')
+          |       BUGGY
       li#nav_item.others
         a(href="https://buggy333.herokuapp.com/!") Log Out
-      li#nav_item.others
-        a(href='#about') Settings
-      li#nav_items.other
-        a BUGGY
+      li#nav_items.others
+        a(onclick = "") New File
     #editor
-      ul.top_nav
-        .lv-body
-          li(style="display: inline")
-            button.btn.btn-default.btn-icon-text.waves-effect
-              span.glyphicon.glyphicon-file
-              |  New File
+      ul.nav.nav-pills.nav-justified
+        li.active
+          a#pills(data-toggle='pill', href='#untitled-1')
+            span.glyphicon.glyphicon-remove(onclick="" style="float: right")
+            | Untitled
 
-          li(style="display: inline")
-
-          li(style="display: inline; float:right")
-            button.btn.btn-default.btn-icon-text.waves-effect
-              span.glyphicon.glyphicon-floppy-disk
-              |  Save File
-      code#center
+      .tab-content(style="position: absolute; display:block; width:100% !important; height:99% !important; padding:0;border-width:0")
+        #untitled-1.tab-pane.fade.in.active(style="overflow: auto")
+          code#center
     #snippet
       ul.nav.nav-pills.nav-justified
         li
@@ -198,8 +194,9 @@ html
               .lv-body
 
         pre#code_execution.tab-pane.fade(style='background-color: white; border: none')
-          .btn-colors.btn-demo
-            button.btn.bgm-green.waves-effect Run
+          ul.nav.nav-pills.nav-justified
+            li.code_exec(style="background-color: green; border-radius: 5px")
+              a#pill(onclick="execute()" style="color: white;") Run
           pre#output(style='background-color: white; border: none')
 
         #buggy_documentation.tab-pane.fade(style='background-color: white; border: none')
@@ -447,6 +444,11 @@ html
           list[i].remove()
         }
         socket.emit('getFiles', {username: "#{user_name}"});
+      }
+
+      var execute = function() {
+        var text = editor.getValue();
+        runit(text);
       }
 
       var compiler = function(data, editor){
