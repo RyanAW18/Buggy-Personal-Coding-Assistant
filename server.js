@@ -373,7 +373,12 @@ function checkEmail(email, res) {
         } else if (result.length > 0) {
             callbackFail(res)
         }
-        return true;
+        else
+        {
+          return true;
+        }
+      })
+        
 }
 
 function loginAccount(username, password, callbackSucc, callbackFail, req, res) {
