@@ -342,13 +342,16 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
 
       var userDB = db.collection('users')
       //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-      userDB.find({'username' : username}, {'email' : email}).toArray(function(err, result) {
+      userDB.find({'username' : username}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } else if (result.length > 0) {
             callbackFail(res)
         } else {
-              var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
+              var check = checkEmail(email, res);
+              if (check == true) {
+                var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
+              }
             userDB.insert(userJSON, function(err, result) {
             if (err) {
                 console.log(err);
@@ -361,6 +364,16 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
         })
     });
   }
+}
+
+function checkEmail(email, res) {
+  userDB.find({'username' : username}).toArray(function(err, result) {
+        if (err) {
+            console.log(err);
+        } else if (result.length > 0) {
+            callbackFail(res)
+        }
+        return true;
 }
 
 function loginAccount(username, password, callbackSucc, callbackFail, req, res) {
