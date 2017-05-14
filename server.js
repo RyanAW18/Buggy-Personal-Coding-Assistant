@@ -319,7 +319,7 @@ app.get('/new_account', function(req, res){
 })
 
 app.get('/about', function(req, res) {
-  res.sendFile(__dirname + '/about.html')
+  res.sendFile(__dirname + '/about')
 })
 
 app.get('/tutorial', function(req, res) {
