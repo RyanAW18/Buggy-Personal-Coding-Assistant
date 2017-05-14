@@ -44,19 +44,19 @@ app.get('/', function(req, res){
 
 // Socket connection setup to aid in communication between server and clients.
 io.on('connection', function(socket){
-  socket.emit('welcome', {message: "Welcome to Buggy, "})
+  socket.emit('welcome', {message: "Welcome to Buggy"})
 
   /******** FILE RENDER Function ******************************************************/
-function fileRender(username, callbackFail) {
 
-  if ((typeof(username) != 'string') || (feedback == ""))
+socket.on('getFiles', function(data){
+  var email = data.username;
+    // Connect to the Server
+  if ((typeof(email) != 'string'))
   {
     console.log('Not a valid input');
-    callbackFail(res);
   }
   else
   {
-    // Connect to the Server
     MongoClient.connect(db_url, function (err, db) {
     if (err) {
       console.log('Unable to connect to the mongoDB server. Error:', err);
@@ -66,39 +66,7 @@ function fileRender(username, callbackFail) {
 
       var userDB = db.collection('users')
       //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-      userDB.find({'username' : username}).toArray(function(err, result) {
-        if (err) {
-            console.log(err);
-        } else if (result.length) {
-            callbackFail(res)
-        } else {
-              var dictionary = result[0]["files"];
-              var files = []
-              for (var key in dictionary) {
-                files.push(key);
-              }
-
-              socket.emit('files', files)
-              //send the file names to the front end
-          }
-        })
-    });
-  }
-}
-
-socket.on('getFiles', function(data){
-  var username = data.username;
-    // Connect to the Server
-    MongoClient.connect(db_url, function (err, db) {
-    if (err) {
-      console.log('Unable to connect to the mongoDB server. Error:', err);
-    } else {
-      console.log('Database connection established');
-    }
-
-      var userDB = db.collection('users')
-      //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-      userDB.find({'username' : username}).toArray(function(err, result) {
+      userDB.find({'email' : email}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } else if (result.length) {
@@ -114,6 +82,7 @@ socket.on('getFiles', function(data){
           }
         })
     });
+  } 
 });
 
 /**************************************************************************************/
@@ -122,8 +91,15 @@ socket.on('getFiles', function(data){
   });
 
   socket.on('open', function (data) {
-    var username = data.username;
+    var email = data.username;
     var filename = data.name;
+  if ((typeof(email) != 'string') || (typeof(filename) != 'string'))
+  {
+    console.log('Not a valid input');
+  }
+  else
+  {
+
     MongoClient.connect(db_url, function (err, db) {
       if (err) {
         console.log('Unable to connect to the mongoDB server. Error:', err);
@@ -133,11 +109,11 @@ socket.on('getFiles', function(data){
 
         var userDB = db.collection('users')
         //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-        userDB.find({'username' : username}).toArray(function(err, result) {
+        userDB.find({'email' : email}).toArray(function(err, result) {
           if (err) {
               console.log(err);
           } else if (result.length) {
-            console.log("Found account" + username)
+            console.log("Found account" + email)
             var dictionary = result[0]["files"];
             var content = dictionary[filename]
             socket.emit('opened', {file: content})
@@ -147,7 +123,7 @@ socket.on('getFiles', function(data){
             }
           })
       });
-    console.log("sorry, you are currently not logged into an account :(")
+  }
   });
 
   socket.on('search', function(data){
@@ -173,19 +149,14 @@ socket.on('getFiles', function(data){
     })
   })
 
-  socket.on('execute', function(data){
-     let code = data.message;
-     python.exec(code).then(function(results){
-   newresults = results.replace('\n', '<br>');
-   socket.emit('executionresults', {response: newresults});
-     }).catch((error) => {
-      console.log(error.reason)
-     });
-  })
-
   socket.on('download', function(data){
-    var username = data.username;
+    var email = data.username;
     var filename = data.name;
+    if ((typeof(email) != 'string') || (typeof(filename) != 'string'))
+  {
+    console.log('Not a valid input');
+  }
+  else {
     MongoClient.connect(db_url, function (err, db) {
       if (err) {
         console.log('Unable to connect to the mongoDB server. Error:', err);
@@ -195,11 +166,11 @@ socket.on('getFiles', function(data){
 
         var userDB = db.collection('users')
         //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-        userDB.find({'username' : username}).toArray(function(err, result) {
+        userDB.find({'email' : email}).toArray(function(err, result) {
           if (err) {
               console.log(err);
           } else if (result.length) {
-            console.log("Found account" + username)
+            console.log("Found account" + email)
             var dictionary = result[0]["files"];
             var contents = dictionary[filename];
             socket.emit("downloadableFile", {name: filename, content: contents});
@@ -209,9 +180,106 @@ socket.on('getFiles', function(data){
             }
           })
       });
-      console.log("sorry, you are currently not logged into an account :(")
+  }
   })
 
+  /************** function that DELETES a file from a users account ***************/
+function deleteFile(email, filename, callbackSucc) {
+  if ((typeof(email) != 'string') || (typeof(filename) != 'string'))
+  {
+    console.log('Not a valid input');
+  }
+  else
+  {
+    // Connect to the Server
+    MongoClient.connect(db_url, function (err, db) {
+      if (err) {
+        console.log('Unable to connect to the mongoDB server. Error:', err);
+      } else {
+        console.log('Database connection established');
+      }
+
+        var userDB = db.collection('users')
+        //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
+        userDB.find({'email' : email}).toArray(function(err, result) {
+          if (err) {
+              console.log(err);
+          } else if (result.length) {
+            console.log("Found account" + email)
+              callbackSucc(result[0]["files"], filename, userDB, email)
+          } else {
+                console.log("no files available of that name")
+                return 0
+            }
+          })
+      });
+  }
+  return 0;
+}
+
+/*********************** SAVE FUNCTIONS HERE *****************************************/
+function saveFile(email, filename, contentString, callbackSucc) {
+  if ((typeof(email) != 'string') || (typeof(filename) != 'string') || (typeof(contentString) != 'string'))
+  {
+    console.log('Not a valid input');
+  }
+  else
+  {
+    // Connect to the Server
+    MongoClient.connect(db_url, function (err, db) {
+      if (err) {
+        console.log('Unable to connect to the mongoDB server. Error:', err);
+      } else {
+        console.log('Database connection established');
+      }
+
+        var userDB = db.collection('users')
+        //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
+        userDB.find({'email' : email}).toArray(function(err, result) {
+          if (err) {
+              console.log(err);
+          } else if (result.length) {
+            console.log("Found account" + email)
+              callbackSucc(result[0]["files"], filename, contentString, userDB, email)
+          } else {
+                console.log("no files available of that name")
+                return 0
+            }
+          })
+      });
+  }
+    return 0;
+}
+
+/********** send to downloads link (HTML5 solution) *****************/
+function savetoDatabase(fileDict, filename, contentString, userDB, email) {
+  var dictionary = fileDict;
+  dictionary[filename] = contentString;
+
+  userDB.update(
+    {'email' : email},
+    {'$set' : 
+      {
+        'files' : dictionary
+      }
+    }
+  )
+  socket.emit('update', {file:filename});
+}
+
+/**************** call back function for deleting file **************/
+function removeFile(fileDict, filename, userDB, email) {
+  var dictionary = fileDict;
+  delete dictionary[filename]
+  userDB.update(
+    {'email' : email},
+    {'$set' : 
+      {
+        'files' : dictionary
+      }
+    }
+  )
+}
 
   socket.on('saveFile', function(data){
     saveFile(data.username, data.name, data.content, savetoDatabase);
@@ -227,18 +295,17 @@ socket.on('getFiles', function(data){
 
 // Post method to deal with logins.
 app.post('/newlog', function(req, res){
-  var username = req.body.username
+  var email = req.body.email
   var password = req.body.password
-  loginAccount(username, password, redirectHome, redirectEmailCollision, req, res)
+  loginAccount(email, password, redirectHome, redirectEmailCollision, req, res)
 })
 
 // Post method to deal with sign ups.
 app.post('/createAccount', function(req, res){
   var email = req.body.email
-  var username = req.body.username
   var password = req.body.password
   var passwordConf = req.body.passwordConf
-  createAccount(email, password, passwordConf, username, redirectHome, redirectEmailCollision, req, res)
+  createAccount(email, password, passwordConf, redirectHome, redirectEmailCollision, req, res)
 })
 
 app.post('/userInput', function(req, res){
@@ -322,13 +389,18 @@ function download(url) {
 
 /********************* Helper functions used in Account creations and Logins *****************/
 
-function createAccount(email, password, passwordConf, username, callbackSucc, callbackFail, req, res) {
+function createAccount(email, password, passwordConf, callbackSucc, callbackFail, req, res) {
 
   var salt = bcrypt. genSaltSync(10);
   var hash = bcrypt.hashSync(password, salt);
 
-  if ((password != passwordConf) || (email == "") || (password == "") || (username == "")) {
+  if ((password != passwordConf) || (email == "") || (password == "")) {
     callbackFail(res)
+  }
+  else if ((typeof(email) != 'string') || (typeof(password) != 'string') || (typeof(passwordConf) != 'string'))
+  {
+    console.log('Not a valid input');
+    callbackFail(res);
   }
   else
   {
@@ -342,20 +414,19 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
 
       var userDB = db.collection('users')
       //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-      userDB.find({'username' : username}).toArray(function(err, result) {
+      userDB.find({'email' : email}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } else if (result.length > 0) {
             callbackFail(res)
         } else {
-              userDB.dropIndex({email : 1});
-              var userJSON = {"username": username, "email": email, "password": hash, "files": {}}
+              var userJSON = {"email": email, "password": hash, "files": {}}
             userDB.insert(userJSON, function(err, result) {
             if (err) {
                 console.log(err);
                 } else {
-                  console.log(username + " was added!")
-                  callbackSucc(req, res, username)
+                  console.log(email + " was added!")
+                  callbackSucc(req, res, email)
                 }
             })
           }
@@ -364,7 +435,7 @@ function createAccount(email, password, passwordConf, username, callbackSucc, ca
   }
 }
 
-function loginAccount(username, password, callbackSucc, callbackFail, req, res) {
+function loginAccount(email, password, callbackSucc, callbackFail, req, res) {
   console.log('hi')
 
   // Connect to the Server
@@ -376,8 +447,7 @@ function loginAccount(username, password, callbackSucc, callbackFail, req, res) 
     }
 
       var userDB = db.collection('users')
-      console.log(username)
-      userDB.find({'username' : username}).toArray(function(err, result) {
+      userDB.find({'email' : email}).toArray(function(err, result) {
         if (err) {
             console.log(err);
         } 
@@ -388,7 +458,7 @@ function loginAccount(username, password, callbackSucc, callbackFail, req, res) 
               callbackFail(res)
             }
             else {
-              callbackSucc(req, res, username)
+              callbackSucc(req, res, email)
             }
             
         } else {
@@ -398,108 +468,24 @@ function loginAccount(username, password, callbackSucc, callbackFail, req, res) 
     });
 }
 
-function redirectHome(req, res, username) {
-  if (username.length == 0) {
+function redirectHome(req, res, email) {
+  if (email.length == 0) {
     res.send("error") 
   }
   else {
-    req.session.user = username
+    req.session.user = email
     res.redirect("/")
   }
 }
 
 function redirectEmailCollision(res) {
-  res.redirect("/")
+  res.redirect("/new_account")
 }
 
 function checkLoginStatus(req) {
   if (req.session.user == undefined) return false
   if (req.session.user.length == 0) return false
   else return true
-}
-
-/*********************** SAVE FUNCTIONS HERE *****************************************/
-function saveFile(username, filename, contentString, callbackSucc) {
-    // Connect to the Server
-    MongoClient.connect(db_url, function (err, db) {
-      if (err) {
-        console.log('Unable to connect to the mongoDB server. Error:', err);
-      } else {
-        console.log('Database connection established');
-      }
-
-        var userDB = db.collection('users')
-        //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-        userDB.find({'username' : username}).toArray(function(err, result) {
-          if (err) {
-              console.log(err);
-          } else if (result.length) {
-            console.log("Found account" + username)
-              callbackSucc(result[0]["files"], filename, contentString, userDB, username)
-          } else {
-                console.log("no files available of that name")
-                return 0
-            }
-          })
-      });
-    console.log("sorry, you are currently not logged into an account :(")
-    return 0;
-}
-
-/********** send to downloads link (HTML5 solution) *****************/
-function savetoDatabase(fileDict, filename, contentString, userDB, username) {
-  var dictionary = fileDict;
-  dictionary[filename] = contentString;
-
-  userDB.update(
-    {'username' : username},
-    {'$set' : 
-      {
-        'files' : dictionary
-      }
-    }
-  )
-}
-
-/************** function that DELETES a file from a users account ***************/
-function deleteFile(username, filename, callbackSucc) {
-    // Connect to the Server
-    MongoClient.connect(db_url, function (err, db) {
-      if (err) {
-        console.log('Unable to connect to the mongoDB server. Error:', err);
-      } else {
-        console.log('Database connection established');
-      }
-
-        var userDB = db.collection('users')
-        //CHECK IF DB CONTAINS ACCOUNT WITH THAT EMAIL BEFORE CREATING NEW ACCOUNT
-        userDB.find({'username' : username}).toArray(function(err, result) {
-          if (err) {
-              console.log(err);
-          } else if (result.length) {
-            console.log("Found account" + username)
-              callbackSucc(result[0]["files"], filename, userDB, username)
-          } else {
-                console.log("no files available of that name")
-                return 0
-            }
-          })
-      });
-    console.log("sorry, you are currently not logged into an account :(")
-}
-
-/**************** call back function for deleting file **************/
-function removeFile(fileDict, filename, userDB, username) {
-  var dictionary = fileDict;
-  delete dictionary[filename]
-  userDB.update(
-    {'username' : username},
-    {'$set' : 
-      {
-        'files' : dictionary
-      }
-    }
-  )
 }
 
 /************************************** Starting the server **************************************/

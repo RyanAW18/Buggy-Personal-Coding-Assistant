@@ -50,9 +50,6 @@
                     <li>
                         <a class="page-scroll" href="http://127.0.0.1:8081/about">About</a>
                     </li>
-                    <li>
-                        <a class="page-scroll" href="http://127.0.0.1:8081/tutorial">Tutorial</a>
-                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -71,11 +68,10 @@
 
                                 <div id="login">
                                     <form name= "myForm" class="form" method="POST" action="/createAccount">
-                                        <input type="text" name="username" placeholder="Choose a username">
                                         <input type="text" name="email" placeholder="Email address">
-                                        <input type="password" name="password" placeholder="Choose your password">
-                                        <input type="password" name="passwordConf" placeholder="Confirm your password">
-                                        <input type="submit" onclick= "formSubmit()" id="login-btn" value = "Sign up">
+                                        <input type="password" name="password" placeholder="Password">
+                                        <input type="password" name="passwordConf" placeholder="Confirm Password">
+                                        <input type="submit" onclick= "formSubmit()" id="login-btn" value = "Sign up" style="background-color: #33597f">
                                     </form>
 
                         </a>

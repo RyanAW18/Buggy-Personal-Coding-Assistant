@@ -8,7 +8,7 @@ body {
   height: 100%;
   font-family: "Lora", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
-  background-color: #4e4e4e;
+  background-color: #212b3d;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    white;

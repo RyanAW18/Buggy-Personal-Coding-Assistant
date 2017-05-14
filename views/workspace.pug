@@ -103,7 +103,76 @@ html
         word-wrap: normal !important;
         white-space: pre !important;
       }
+      /* The Modal (background) */
+      .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 100px; /* Location of the box */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
 
+      /* Modal Content */
+      .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 1px solid #888;
+          width: 30%;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          -webkit-animation-name: animatetop;
+          -webkit-animation-duration: 0.4s;
+          animation-name: animatetop;
+          animation-duration: 0.4s
+      }
+
+      /* Add Animation */
+      @-webkit-keyframes animatetop {
+          from {top:-300px; opacity:0} 
+          to {top:0; opacity:1}
+      }
+
+      @keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+      }
+
+      /* The Close Button */
+      .close {
+          color: white;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+      }
+
+      .modal-header {
+          background-color: #212b3d;
+          color: white;
+      }
+
+      .modal-body {
+        padding: 2px 16px;
+        background-color: #212b3d;
+      }
+
+      .modal-footer {
+          background-color: #212b3d;
+          color: white;
+      }
       #snippet {
       position: relative;
       width:calc(48% - 10px);
@@ -119,7 +188,7 @@ html
       position: relative;
       margin: 5px;
       width: calc(51% - 10px);
-      height:87.5%;
+      height:92%;
       float: left
       }
       #center {
@@ -158,19 +227,26 @@ html
       li#nav_item.others
         a(href="https://buggy333.herokuapp.com/!") Log Out
       li#nav_items.others
-        a(onclick = "") New File
+        a(onclick = "newFile()") New File
       li#nav_items.others
-        a(onclick = "") Save File
-    #editor
-      ul.nav.nav-pills.nav-justified
-        li.active
-          a#pills(data-toggle='pill', href='#untitled-1')
-            span.glyphicon.glyphicon-remove(onclick="" style="float: right")
-            | Untitled
+        a(onclick = "saveOnClick()") Save File as
 
-      .tab-content(style="position: absolute; display:block; width:100% !important; height:99% !important; padding:0;border-width:0")
-        #untitled-1.tab-pane.fade.in.active(style="overflow: auto")
-          code#center
+    // The Modal
+    #myModal.modal
+      // Modal content
+      .modal-content
+        .modal-header
+          span.close ×
+          h2 Save file as:
+        .modal-body
+          br
+          input#fname(type='text', name='filename')
+        .modal-footer
+          ul.top_nav
+            li#nav_items.others(style="width:100%")
+              a(onclick="getFileName()" style="float:right") Save
+    #editor
+      code#center
     #snippet
       ul.nav.nav-pills.nav-justified
         li
@@ -240,11 +316,50 @@ html
     script(src='/socket.io/socket.io.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js', type='text/javascript', charset='utf-8')
     script(type='text/javascript').
+
+      var getFileName = function(){
+        var filename = document.getElementById("fname").value;
+        var list = document.getElementsByClassName("lv-item media");
+        var alreadyIn = false;
+        for (var i = 0; i < list.length; i++){
+          if (list[i].id == filename){
+          alreadyIn = true; 
+          }
+        }
+         if ((filename == null || filename == "") || (alreadyIn)) {
+          alert("Invalid File Name");
+         }
+          else{
+            console.log("THis is the file name" + filename);
+            hasName = true;
+            file_name = filename;
+            saveFile(filename);
+            savedFile = true;
+            fileDisplay(filename);
+            var list = document.getElementsByClassName("button_holder");
+            console.log(list)
+            for (var i = 0; i < list.length; i++){
+              list[i].style.visibility = "hidden"
+            }
+            document.getElementById(filename+"_buttons").style.visibility="visible";
+            console.log('true')
+          }
+          var modal = document.getElementById('myModal');
+          modal.style.display = "none";
+      }
       /************************************* Setting Up editor ***********************************************************/
+      hasName = false;
+      file_name = "";
+      savedFile = false;
       var editor = ace.edit("center");
       editor.setTheme("ace/theme/cobalt");
       editor.getSession().setMode("ace/mode/python");
       editor.setShowPrintMargin(false);
+      editor.on("change", function(e){
+        if(hasName){
+          saveFile(file_name)
+        }
+      })
       /************************************** Socket Setup ***************************************************************/
       $(".nav-pills").click(function(){
           $(this).tab('show');
@@ -270,7 +385,7 @@ html
       socket.on('welcome', function(data){
       var user = ""+ "#{user_name}"
       console.log(user);
-      document.getElementById("code_snippets").innerHTML += data.message +  user + '!\n';
+      document.getElementById("code_snippets").innerHTML += data.message + '!\n';
       });
 
       var deleteFile = function (filename){
@@ -283,25 +398,68 @@ html
         socket.emit('download', {username: user , name: filename});
       } 
 
+      var saveOnClick = function(){
+        if (!hasName){
+          // Get the modal
+          var modal = document.getElementById('myModal');
+
+          // Get the <span> element that closes the modal
+          var span = document.getElementsByClassName("close")[0];
+
+          modal.style.display = "block";
+
+          // When the user clicks on <span> (x), close the modal
+          span.onclick = function() {
+              modal.style.display = "none";
+          }
+
+          // When the user clicks anywhere outside of the modal, close it
+          window.onclick = function(event) {
+              if (event.target == modal) {
+                  modal.style.display = "none";
+              }
+          }
+        }
+      }
+
+      var newFile = function(){
+        if ((editor.getValue() != "") &&(!hasName)){
+          if (confirm("Would you like to save the current file?") == true){
+            saveOnClick()
+          }
+        }
+        else {
+          file_name = 'untitled';
+          hasName = false;
+          editor.setValue("", -1);
+          editor.navigateFileEnd();
+          savedFile = false;
+        }
+      }
+
       var saveFile = function (filename){
-      var fileContent = editor.getValue();
-      var user = "#{user_name}"
-      socket.emit('saveFile', {content: fileContent, username: user, name: filename});
+        var fileContent = editor.getValue();
+        var user = "#{user_name}"
+        socket.emit('saveFile', {content: fileContent, username: user, name: filename});
+        savedFile = true;
       }
 
       var openFile = function(filename){
-        var user = "#{user_name}";
-        socket.emit('open', {username: user, name: filename});
+        if (filename != file_name){
+          var user = "#{user_name}";
+          socket.emit('open', {username: user, name: filename});
+          file_name = filename;
+          hasName = true;
+        }
       }
 
+      var fileDisplay = function(filename){
 
-      socket.on('files', function(data){
-
-      console.log(data.filename);
+      console.log(filename);
       var user = "#{user_name}";
       var file = document.createElement('div');
-      var filename = data.filename;
-      file.id = data.filename;
+      var filename = filename;
+      file.id = filename;
       file.className = "lv-item media"; 
 
       file.addEventListener("click", function() {
@@ -310,8 +468,8 @@ html
         for (var i = 0; i < list.length; i++){
           list[i].style.visibility = "hidden"
         }
-        openFile(data.filename);
-        document.getElementById(data.filename+"_buttons").style.visibility="visible";
+        openFile(filename);
+        document.getElementById(filename+"_buttons").style.visibility="visible";
         console.log('true')
       }, false);
 
@@ -326,21 +484,17 @@ html
       parent = button_demo_div;
       var titleDiv = document.createElement('div');
       titleDiv.classname = "lv-title"
-      titleDiv.innerHTML = data.filename;
+      titleDiv.innerHTML = filename;
       parent.append(titleDiv);
 
       parent = titleDiv;
       var button_holder_Div = document.createElement('div');
       button_holder_Div.className = 'button_holder';
-      button_holder_Div.id = data.filename+"_buttons"
+      button_holder_Div.id = filename+"_buttons"
       button_holder_Div.style.visibility ='hidden'
       parent.append(button_holder_Div);
 
       parent = button_holder_Div;
-      var save_button = document.createElement('button');
-      save_button.className = "btn btn-default btn-sm";
-      save_button.type = "button";
-      parent.append(save_button);
 
       var download_button = document.createElement('button');
       download_button.className = "btn btn-default btn-sm";
@@ -351,12 +505,6 @@ html
       delete_button.className = "btn btn-default btn-sm";
       delete_button.type = "button";
       parent.append(delete_button);
-
-      parent = save_button;
-      var spanDiv = document.createElement('span');
-      spanDiv.className = 'glyphicon glyphicon-floppy-save';
-      parent.append(spanDiv);
-      parent.innerHTML += " Save";
 
       spanDiv = document.createElement('span');
       spanDiv.className = 'glyphicon glyphicon-download';
@@ -369,24 +517,29 @@ html
       delete_button.innerHTML += " Delete";
 
       delete_button.addEventListener("click", function(e) {
-        document.getElementById(data.filename).remove();
-        deleteFile(data.filename);
+        if (confirm("Are you sure you want to delete "+ filename+ "?") == true){
+        document.getElementById(filename).remove();
+        deleteFile(filename);
+        hasName = false;
+        savedFile = false;
+        file_name = "untitled"
+        editor.setValue("", -1);
+        editor.navigateFileEnd();
         console.log('true')
         e.stopPropagation()
+        }
       }, false);
 
       download_button.addEventListener("click", function(e) {
-        downloadFile(data.filename);
+        downloadFile(filename);
         console.log('true')
         e.stopPropagation()
       }, false);
+      }
 
-      save_button.addEventListener("click", function(e) {
-        saveFile(data.filename);
-        console.log('true')
-        e.stopPropagation()
-      }, false);
 
+      socket.on('files', function(data){
+        fileDisplay(data.filename)
      });
 
       socket.on('downloadableFile', function(data){
@@ -398,6 +551,10 @@ html
       elem.click();
       document.body.removeChild(elem);
       });
+
+      //socket.on('update', function(data){
+        //openFile(data.file);
+      //});
 
 
       /**************************************** Running Code on the Client Side ******************************************/
@@ -440,15 +597,6 @@ html
       listening = false;
       socket.emit('getFiles', {username: "#{user_name}"});
 
-      var updater = function() {
-        var list = document.getElementsByClassName("lv-item media");
-        console.log(list)
-        for (var i = 0; i < list.length; i++){
-          list[i].remove()
-        }
-        socket.emit('getFiles', {username: "#{user_name}"});
-      }
-
       var execute = function() {
         var text = editor.getValue();
         runit(text);
@@ -484,18 +632,29 @@ html
                   break;
                 }
                 else if ((((messages[i+1] == "save") && (messages[i+2] == 'file')) && (messages[i+3] == 'as')) && (messages.length >= 5)) {
+                  savedFile = true;
                   var fileContent = editor.getValue();
                   var filename = messages[i+4]
+                  var list = document.getElementsByClassName("lv-item media");
+                  var alreadyIn = false;
+                  for (var i = 0; i < list.length; i++){
+                    if (list[i].id == filename){
+                    alreadyIn = true; 
+                    }
+                  }
+                 if ((filename == null || filename == "") || (alreadyIn)) {
+                  alert("Invalid File Name");
+                 }
+                else {
                   var user = "#{user_name}"
                   socket.emit('saveFile', {content: fileContent, username: user, name: filename});
-                  updater()
-                  break;
                 }
+                  break;
+              }
                 else if ((((messages[i+1] == "delete") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
                   var filename = messages[i+4]
                   var user = "#{user_name}"
                   socket.emit('deleteFile', {username: user, name: filename});
-                  updater()
                   break;
                 }
                 else if ((((messages[i+1] == "download") && (messages[i+2] == 'file')) && (messages[i+3] == 'named')) && (messages.length >= 5)) {
@@ -508,6 +667,10 @@ html
                   var filename = messages[i+4]
                   var user = "#{user_name}";
                   socket.emit('open', {username: user, name: filename});
+                  break;
+                }
+                else if (((messages[i+1] == "create") && (messages[i+2] == 'new')) && (messages[i+3] == 'file')) {
+                  newFile();
                   break;
                 }
               }
@@ -656,7 +819,7 @@ html
             recognition.onerror = function(event) { console.log("oops") }
             recognition.onend = function() { recognition.start() }
             recognition.onresult = function(event) {
-            compiler(event.results[0][0].transcript, editor);
+            compiler(event.results[0][0].transcript.toLowerCase(), editor);
           };
         }
           console.log("Hello World")
